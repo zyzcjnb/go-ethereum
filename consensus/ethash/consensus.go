@@ -31,6 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
@@ -142,7 +143,10 @@ func (ethash *Ethash) VerifyHeaders(chain consensus.ChainHeaderReader, headers [
 			if parent == nil {
 				err = consensus.ErrUnknownAncestor
 			} else {
+				verifyoldheaderstart := time.Now()
 				err = ethash.verifyHeader(chain, header, parent, false, unixNow)
+				verifyoldheadertime := time.Since(verifyoldheaderstart)
+				log.Info("verify old header time", "time", verifyoldheadertime, "header", header.Hash().Hex())
 			}
 			select {
 			case <-abort:

@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/consensus"
@@ -29,6 +30,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/tracing"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/core/vm"
+	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/trie"
@@ -315,7 +317,10 @@ func (beacon *Beacon) verifyHeaders(chain consensus.ChainHeaderReader, headers [
 				}
 				continue
 			}
+			verifynewheaderstart := time.Now()
 			err := beacon.verifyHeader(chain, header, parent)
+			verifynewheadertime := time.Since(verifynewheaderstart)
+			log.Info("verify new header time", "time", verifynewheadertime, "header", header.Hash().Hex())
 			select {
 			case <-abort:
 				return

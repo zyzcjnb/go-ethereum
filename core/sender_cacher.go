@@ -19,8 +19,10 @@ package core
 import (
 	"runtime"
 	"sync"
+	"time"
 
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/log"
 )
 
 // senderCacherOnce is used to ensure that the SenderCacher is initialized only once.
@@ -71,7 +73,10 @@ func newTxSenderCacher(threads int) *txSenderCacher {
 func (cacher *txSenderCacher) cache() {
 	for task := range cacher.tasks {
 		for i := 0; i < len(task.txs); i += task.inc {
+			huifusenderstart := time.Now()
 			types.Sender(task.signer, task.txs[i])
+			huifusendertime := time.Since(huifusenderstart)
+			log.Info("sender huifu time", "time", huifusendertime, "tx", task.txs[i].Hash().Hex())
 		}
 	}
 }

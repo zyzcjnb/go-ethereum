@@ -1591,7 +1591,10 @@ func (bc *BlockChain) insertChain(chain types.Blocks, setHead bool, makeWitness 
 	}()
 
 	// Start a parallel signature recovery (signer will fluke on fork transition, minimal perf loss)
+	tijiaohuifustart := time.Now()
 	SenderCacher().RecoverFromBlocks(types.MakeSigner(bc.chainConfig, chain[0].Number(), chain[0].Time()), chain)
+	tijiaohuifutime := time.Since(tijiaohuifustart)
+	log.Debug("Tijiao Recover sender tasks from blocks", "time", tijiaohuifutime)
 
 	var (
 		stats     = insertStats{startTime: mclock.Now()}
@@ -1608,7 +1611,10 @@ func (bc *BlockChain) insertChain(chain types.Blocks, setHead bool, makeWitness 
 	for i, block := range chain {
 		headers[i] = block.Header()
 	}
+	tijiaoheaderstart := time.Now()
 	abort, results := bc.engine.VerifyHeaders(bc, headers)
+	tijiaoheadertime := time.Since(tijiaoheaderstart)
+	log.Info("Tijiao Verify headers", "time", tijiaoheadertime)
 	defer close(abort)
 
 	// Peek the error for the first block to decide the directing import logic
@@ -1911,6 +1917,8 @@ func (bc *BlockChain) processBlock(block *types.Block, statedb *state.StateDB, s
 	}
 	xvtime := time.Since(xvstart)
 	proctime := time.Since(start) // processing + validation + cross validation
+	log.Info("Block processing time", "time", proctime, "block", block.Number(), "hash", block.Hash(),
+		"processing", ptime, "validation", vtime, "cross-validation", xvtime)
 
 	// Update the metrics touched during block processing and validation
 	accountReadTimer.Update(statedb.AccountReads) // Account reads are complete(in processing)
