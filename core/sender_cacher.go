@@ -71,14 +71,14 @@ func newTxSenderCacher(threads int) *txSenderCacher {
 // cache is an infinite loop, caching transaction senders from various forms of
 // data structures.
 func (cacher *txSenderCacher) cache() {
+	huifusenderstart := time.Now()
 	for task := range cacher.tasks {
 		for i := 0; i < len(task.txs); i += task.inc {
-			huifusenderstart := time.Now()
 			types.Sender(task.signer, task.txs[i])
-			huifusendertime := time.Since(huifusenderstart)
-			log.Info("sender huifu time", "time", huifusendertime, "tx", task.txs[i].Hash().Hex())
 		}
 	}
+	huifusendertime := time.Since(huifusenderstart)
+	log.Info("sender huifu time", "time", huifusendertime)
 }
 
 // Recover recovers the senders from a batch of transactions and caches them
