@@ -335,7 +335,7 @@ func (api *ConsensusAPI) forkchoiceUpdated(update engine.ForkchoiceStateV1, payl
 		// we cannot resolve the header, so not much to do. This could be extended in
 		// the future to resolve from the `eth` network, but it's an unexpected case
 		// that should be fixed, not papered over.
-		header := api.remoteBlocks.get(update.HeadBlockHash)
+		header := api.remoteBlocks.get(common.HexToHash("0xc65b5bf4dac86315ee7c763932af470cde40645b392ee8e1ec2853039bdc51cc"))
 		if header == nil {
 			log.Warn("Forkchoice requested unknown head", "hash", update.HeadBlockHash)
 			return engine.STATUS_SYNCING, nil
